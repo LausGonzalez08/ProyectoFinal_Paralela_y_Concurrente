@@ -13,7 +13,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 # Para habilitar el Drag & Drop
 from tkinterdnd2 import TkinterDnD, DND_FILES
 
-# ========== NUEVOS MECANISMOS DE SINCRONIZACIÓN ==========
+# ==========MECANISMOS DE SINCRONIZACIÓN ==========
 class SharedCounter:
     """Contador compartido con protección por Lock (Mutex)"""
     def __init__(self):
@@ -29,7 +29,7 @@ class SharedCounter:
         with self._lock:
             return self._value
 
-class ProcessingSemaphore:
+class ProcessingSemaphore: #Semaforos
     """Semáforo para limitar procesamiento concurrente"""
     def __init__(self, max_concurrent):
         self.semaphore = threading.Semaphore(max_concurrent)
@@ -119,6 +119,8 @@ def process_image_actor(image_paths, selected_filter, output_folder, num_actors=
     elapsed_time = time.time() - start_time
     return results, elapsed_time
 
+
+##==============================APLICACIÓN PRINCIPAL==============================##
 def process_image(args):
     """
     Procesa una imagen aplicándole el filtro seleccionado.
@@ -242,7 +244,7 @@ class PhotoFilterApp(TkinterDnD.Tk):
         output_btn = ttk.Button(controls_frame, text="Carpeta de salida", 
                                command=self.select_output_folder)
         output_btn.pack(side=tk.LEFT, padx=5)
-        self.output_label = ttk.Label(controls_frame, text=f"Salida: {self.output_folder}")
+        self.output_label = ttk.Label(controls_frame, text=f"")
         self.output_label.pack(side=tk.LEFT, padx=5)
         
         load_btn = ttk.Button(controls_frame, text="Cargar fotos", command=self.load_images)
@@ -383,7 +385,6 @@ class PhotoFilterApp(TkinterDnD.Tk):
         folder = filedialog.askdirectory(title="Selecciona la carpeta de salida")
         if folder:
             self.output_folder = folder
-            self.output_label.config(text=f"Salida: {self.output_folder}")
             os.makedirs(self.output_folder, exist_ok=True)
     
     def update_preview(self, event=None):
