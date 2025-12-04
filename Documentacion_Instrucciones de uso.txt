@@ -1,0 +1,77 @@
+=========================================== Requisitos ===================================
+Este programa ocupa de tener:
+-Python 3.x
+-tkinter (viene default en Python)
+-tkinterdnd2: Se tiene que instalar aparte con: 
+		//windows
+		pip install tkinterdnd2 
+			o
+		pip3 install tkinterdnd2
+		//MAC OS / Linux
+		# Puede requerir dependencias previas
+		sudo apt-get install python3-tk  # En Debian/Ubuntu
+		brew install python-tk          # En macOS con Homebrew
+
+		# Luego instalar tkinterdnd2
+		pip install tkinterdnd2
+
+======================================= Instrucciones de uso ==================================================================
+Una vez cumpliendo los requisitos, se tiene que ejecutar el archivo "Aplicador_filtros_Evaluador.py" desde un IDE o terminal, ahí depende del gusto del usuario.
+NOTA: al ejecutarse por segunda vez, puede tardar o no ejecutar, aconsejo limpiar la terminal.
+
+Sugerencia de orden de uso:
+
+1.Se selecciona el tipo de Estrategia paralela (Multihilo o Actores) 
+2.Se selecciona la cantidad de Hilos/Actores a usar (Solo se pueden usar 16 Max)
+3.Se selecciona la carpeta de salida
+4.se cargan las fotos para aplicar el filtro
+5.se selecciona el tipo de filtro
+6.se aplican los filtros
+7.se obtiene los resultados de evaluación
+8.se puede observar las imágenes procesadas en "Abrir resultados"
+
+======================================== Partes de la Interfaz ==================================================================================
+Una vez ejecutando, le mostrará  una interfaz, la parte de arriba es la de opciones, en la cual encontramos lo siguiente:
+-  Estrategia Paralela:
+			Aquí se selecciona el tipo de estrategia paralela, multihilo o actores, esta se va a ejecutar después de la versión secuencial,
+			la versión secuencial siempre se ejecuta.
+-  Carpeta de salida:
+			Opción para seleccionar la carpeta donde se guardarán las imágenes procesadas.
+-  Cargar Fotos:
+			Opción para seleccionar las imágenes que se van a procesar
+			NOTA: solo acepta ".png", ".jpg", ".jpeg", ".bmp", ".gif"
+-  Limpiar lista:
+			Opción para quitar todas las imágenes seleccionadas, asi mismo limpiar los logs.
+			NOTA: No se puede quitar imágenes de una en una.
+-  Filtro:
+			Esta opción muestra por defecto "Desenfoque", pero sirve para seleccionar el tipo de filtro que se va a aplicar a la imagen.
+-  Aplicar Filtro:
+			Este botón ejecuta todos los procesos:
+				-Aplica filtro
+				-Versión Secuencial
+				-Versión Paralela
+				-Resumen
+				-Comparación entre secuencial y paralelo
+				-Actualización de interfaz
+-  Abrir Resultados:
+			Este botón sirve para abrir la carpeta de salida y mostrar los archivos procesados.
+- Configuración de Hilos:
+			Esta parte sirve para configurar la cantidad de Hilos/Actores que se van a usar.
+			Muestra la cantidad actual de hilos.
+			Actualiza logs.
+-Métricas de ejecución:
+			Muestra un visualización de los tiempos para secuencial y paralelo, speedup, eficiencia, Hilos usados, Estado (Listo, procesando, error, etc.)
+- Imágenes cargadas:
+			Esta parte muestra una lista con los nombres de las imágenes precargadas al programa.
+			NOTA: Se puede agarra, arrastrar y seleccionar una imagen del explorador de archivos a esa área del interfaz, pero solo funciona de archivo
+			      en archivo, con selección múltiple no funciona.
+-Progreso de procesamiento:
+			Esta área muestra los logs, tanto de procesos en curso como procesos terminados, muestra un resumen de los modelos.
+			NOTA: Esta área se limpia con nuevas tareas.
+- Progreso:
+			Esta es una barra de progreso, se va actualizando conforme al estado general de los procesos, es decir que se muestra lleno cuando termina todo.
+- Vista Previa:
+			Muestra la imagen seleccionada en la lista de imágenes cargadas.
+- Comparación de tiempos:
+			Esta muestra un grafico de barras en donde se comparan ambas versiones (secuencial y paralela).
+
