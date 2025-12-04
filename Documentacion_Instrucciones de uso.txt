@@ -75,3 +75,21 @@ Una vez ejecutando, le mostrará  una interfaz, la parte de arriba es la de opci
 - Comparación de tiempos:
 			Esta muestra un grafico de barras en donde se comparan ambas versiones (secuencial y paralela).
 
+==================================================== Metricas de Tiempo real y evaluacion =================================================================
+Tiempos de ejecución (secuencial vs paralelo)
+
+Speedup y eficiencia
+
+Estado del procesamiento
+
+======================================================Calculo de SpeedUp y eficiencia=====================================================================
+Speedup = Tiempo_Secuencial / Tiempo_Paralelo
+Eficiencia = (Speedup / Número_Hilos) × 100%
+===================================================== Arquitectura ========================================================================================
+[Interfaz Tkinter] → [Controlador] → [Procesador]
+      ↓                    ↓              ↓
+[Vista Previa]    [Estrategia Paralela] [Filtros]
+      ↓                    ↓              ↓
+[Resultados] ←── [Comparador] ←── [Imágenes Procesadas]
+====================================================== Repositorio ========================================================================================
+https://github.com/LausGonzalez08/ProyectoFinal_Paralela_y_Concurrente
