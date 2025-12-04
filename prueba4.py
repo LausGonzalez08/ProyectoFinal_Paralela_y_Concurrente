@@ -1,4 +1,3 @@
-#Librerias
 import os
 import threading
 import queue
@@ -13,60 +12,56 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import subprocess
 import platform
 
-# Para habilitar el Drag & Drop en la interfaz
+# Para habilitar el Drag & Drop
 from tkinterdnd2 import TkinterDnD, DND_FILES
 
 # ==========MECANISMOS DE SINCRONIZACIÓN ==========
 class SharedCounter:
     """Contador compartido con protección por Lock (Mutex)"""
     def __init__(self):
-        self._value = 0 #Valor Inicial del contador.
-        self._lock = threading.Lock() #Lock
+        self._value = 0
+        self._lock = threading.Lock()
     
-    #Funcion de incremento para el Lock
     def increment(self):
         with self._lock:
             self._value += 1
             return self._value
     
-    #Funcion para obtener el estado del Lock
     def get_value(self):
         with self._lock:
             return self._value
 
-#SEMAFORO
 class ProcessingSemaphore: #Semaforos
     """Semáforo para limitar procesamiento concurrente"""
     def __init__(self, max_concurrent):
-        self.semaphore = threading.Semaphore(max_concurrent)#Semaforo con contador de 4 maximo
-        self.active_processes = 0 #Procesos activos
-        self._lock = threading.Lock()#Bloqueo
+        self.semaphore = threading.Semaphore(max_concurrent)
+        self.active_processes = 0
+        self._lock = threading.Lock()
     
     def acquire(self):
         self.semaphore.acquire()
         with self._lock:
-            self.active_processes += 1 #Aumenta un proceso 
+            self.active_processes += 1
     
     def release(self):
         with self._lock:
-            self.active_processes -= 1 #Disminuye yb proceso
+            self.active_processes -= 1
         self.semaphore.release()
     
-    def get_active(self): 
+    def get_active(self):
         with self._lock:
-            return self.active_processes #Obtiene la cantidad de procesos
+            return self.active_processes
 
 # ========== MODELO ACTOR (PATRÓN ACTOR) ==========
 class ProcessingActor:
     """Actor simple para procesamiento de tareas"""
     def __init__(self, result_queue):
-        self.task_queue = queue.Queue() #Lista de Tareas para actores
+        self.task_queue = queue.Queue()
         self.result_queue = result_queue
-        self._running = True #Estado de ejecucion
+        self._running = True
         self.thread = threading.Thread(target=self._run, daemon=True)
         self.thread.start()
     
-    #Ejecucion de Actor
     def _run(self):
         while self._running:
             try:
@@ -79,7 +74,6 @@ class ProcessingActor:
     def submit(self, task):
         self.task_queue.put(task)
     
-    #Señal de alto para actor
     def stop(self):
         self._running = False
 
@@ -87,14 +81,13 @@ class ProcessingActor:
 def process_image_sequential(image_paths, selected_filter, output_folder):
     """Procesamiento secuencial para comparación"""
     results = []
-    start_time = time.time() #Tiempo de inicio
+    start_time = time.time()
     
-    #Para agregar al final del nombre del archivo "Secuencial", solo para identificar por que medio se proceso la imagen
-    for image_path in image_paths: 
+    for image_path in image_paths:
         result = process_image((image_path, selected_filter, output_folder, "secuencial"))
         results.append(result)
     
-    elapsed_time = time.time() - start_time  #Tiempo de inicio
+    elapsed_time = time.time() - start_time
     return results, elapsed_time
 
 # ========== VERSIÓN CON MODELO ACTOR ==========
@@ -125,7 +118,7 @@ def process_image_actor(image_paths, selected_filter, output_folder, num_actors=
     for actor in actors:
         actor.stop()
     
-    elapsed_time = time.time() - start_time #Tiempo de inicio
+    elapsed_time = time.time() - start_time
     return results, elapsed_time
 
 ##==============================APLICACIÓN PRINCIPAL==============================##
@@ -179,7 +172,6 @@ def process_image(args):
             "method": method
         }
 
-#Funcion para seleccionar carpetas
 def open_folder(path):
     """Abre la carpeta en el explorador de archivos del sistema"""
     try:
@@ -192,7 +184,6 @@ def open_folder(path):
     except Exception as e:
         print(f"Error al abrir carpeta: {e}")
 
-#========================INTERFAZ===========================
 class PhotoFilterApp(TkinterDnD.Tk):
     def __init__(self):
         super().__init__()
@@ -255,7 +246,7 @@ class PhotoFilterApp(TkinterDnD.Tk):
         # Cabecera
         header_frame = ttk.Frame(self)
         header_frame.pack(fill=tk.X, padx=20, pady=(20, 10))
-        header_label = ttk.Label(header_frame, text="Aplicador de filtros avanzados", font=self.header_font) #Nombre
+        header_label = ttk.Label(header_frame, text="Comparador: Secuencial vs Paralelo", font=self.header_font)
         header_label.pack()
         
         # Panel superior: controles y botones
@@ -453,7 +444,6 @@ class PhotoFilterApp(TkinterDnD.Tk):
         self.canvas = FigureCanvasTkAgg(self.figure, graph_frame)
         self.canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
     
-#=================================ACTUALIZADOR DE CANTIDAD DE HILOS=======================================
     def update_threads(self):
         """Actualiza el número de hilos basado en la selección del usuario"""
         try:
@@ -494,7 +484,7 @@ class PhotoFilterApp(TkinterDnD.Tk):
                 "Por favor, ingresa un número válido de hilos."
             )
             self.threads_spinbox.set(self.num_threads)
-#===============================FUNCION PARA LIMPIAR LISTA DE IMAGENES SELECIONADAS Y RESULTADOS================================
+    
     def clear_list(self):
         self.image_paths.clear()
         self.sequential_results.clear()
@@ -506,8 +496,7 @@ class PhotoFilterApp(TkinterDnD.Tk):
         self.file_info_label.config(text="Sin imagen seleccionada")
         self.update_metrics()
         self.status_label.config(text="Listo", foreground="#2ECC71")
-
-#======================FUNCION PARA SELECCIONAR FOTOS DE MANERA MANUAL==================================
+    
     def load_images(self):
         paths = filedialog.askopenfilenames(title="Selecciona fotos", 
                                            filetypes=[("Imágenes", "*.jpg *.jpeg *.png *.bmp *.gif")])
@@ -516,7 +505,7 @@ class PhotoFilterApp(TkinterDnD.Tk):
                 if path not in self.image_paths:
                     self.image_paths.append(path)
                     self.listbox.insert(tk.END, os.path.basename(path))
-#==============FUNCION PARA SOLTAR IMAGEN EN LA INTERFAZ===========================================
+    
     def drop_event(self, event):
         files = self.tk.splitlist(event.data)
         for file in files:
@@ -524,8 +513,7 @@ class PhotoFilterApp(TkinterDnD.Tk):
                 if file not in self.image_paths:
                     self.image_paths.append(file)
                     self.listbox.insert(tk.END, os.path.basename(file))
-
-#=====================FUNCION DE CARPETA DE SALIDA======================================
+    
     def select_output_folder(self):
         folder = filedialog.askdirectory(title="Selecciona la carpeta de salida")
         if folder:
@@ -533,7 +521,6 @@ class PhotoFilterApp(TkinterDnD.Tk):
             os.makedirs(self.output_folder, exist_ok=True)
             self.output_label.config(text=f"Salida: {os.path.basename(self.output_folder)}")
     
-#================================FUNCION PARA ABRIR CARPETA CON IMAGENES PROCESADAS======================
     def open_results_folder(self):
         """Abre la carpeta con las imágenes procesadas"""
         if os.path.exists(self.output_folder) and self.all_results:
@@ -541,7 +528,6 @@ class PhotoFilterApp(TkinterDnD.Tk):
         else:
             messagebox.showinfo("Información", "No hay imágenes procesadas aún o la carpeta no existe.")
     
-#==============================FUNCION QUE ACTUALZA LA PARTE DE PREVIEW===================================
     def update_preview(self, event=None):
         try:
             selection = self.listbox.curselection()
@@ -565,14 +551,13 @@ class PhotoFilterApp(TkinterDnD.Tk):
             self.orig_preview_label.config(image="", text="Error al cargar imagen")
             self.file_info_label.config(text=f"Error: {str(e)}")
     
-#============================FUNCION PARA HACER ZOOM AL PREVIEW=================================
     def adjust_zoom(self, event):
         try:
             self.zoom_level = int(float(event))
             self.update_preview()
         except Exception as e:
             self.log_message(f"Error ajustando zoom: {str(e)}")
-    #====================FUNCION DE LOGS=====================
+    
     def log_message(self, message):
         self.log.insert(tk.END, f"{time.strftime('%H:%M:%S')} - {message}\n")
         self.log.see(tk.END)
@@ -597,12 +582,11 @@ class PhotoFilterApp(TkinterDnD.Tk):
                 self.metrics_labels["eficiencia"].config(text=f"{efficiency:.1f}%")
     
     def start_processing(self):
-        """Inicia el procesamiento secuencial -> paralelo
-        Primero ejecuta la version secuencial y luego la version paralela seleccionada (multihilo o actores)"""
-        #Manejo de excepciones
+        """Inicia el procesamiento secuencial -> paralelo"""
         if not self.image_paths:
             messagebox.showwarning("Advertencia", "No hay fotos cargadas.")
             return
+        
         if self.currently_processing:
             messagebox.showwarning("Advertencia", "Ya hay un procesamiento en curso.")
             return
@@ -610,8 +594,8 @@ class PhotoFilterApp(TkinterDnD.Tk):
         self.currently_processing = True
         self.status_label.config(text="Procesando...", foreground="#F39C12")
         
-        selected_filter = self.filter_var.get()#Obtiene el filtro seleccionado
-        parallel_strategy = self.strategy_var.get()#obtiene el modelo paralelo seleccionado
+        selected_filter = self.filter_var.get()
+        parallel_strategy = self.strategy_var.get()
         
         # Reiniciar resultados
         self.sequential_results.clear()
@@ -665,7 +649,7 @@ class PhotoFilterApp(TkinterDnD.Tk):
         self.after(0, self.log_message, "\n=== EJECUTANDO VERSIÓN PARALELA ===")
         self.after(0, self.update_status, "Procesando (Paralelo)...")
         
-        if parallel_strategy == "multithread":#Multihilo
+        if parallel_strategy == "multithread":
             results, elapsed = self.run_multithread_version(selected_filter)
         else:  # actor
             results, elapsed = self.run_actor_version(selected_filter)
@@ -686,12 +670,10 @@ class PhotoFilterApp(TkinterDnD.Tk):
     
     def update_status(self, status):
         self.status_label.config(text=status)
-
-#FUNCION QUE OBTIENE EL PROGRESO DEL PROCESO EN CURSO
+    
     def update_progress(self):
         self.progress_bar["value"] += 1
     
-#===============FUNCION QUE EJECUTA MULTIHILO=================================
     def run_multithread_version(self, selected_filter):
         """Ejecuta la versión multihilo"""
         tasks = [(path, selected_filter, self.output_folder, "multihilo") for path in self.image_paths]
@@ -719,7 +701,6 @@ class PhotoFilterApp(TkinterDnD.Tk):
         self.metrics["Multihilo"].append(elapsed)
         return results, elapsed
     
-#=====================FUNCION QUE EJECUTA ACTORES================================
     def run_actor_version(self, selected_filter):
         """Ejecuta la versión con modelo Actor"""
         start_time = time.time()
@@ -732,7 +713,6 @@ class PhotoFilterApp(TkinterDnD.Tk):
         self.metrics["Modelo Actor"].append(elapsed)
         return results, elapsed
     
-#==================FUNCION PARA MOSTRAR RESUMEN DE LOS PROCESOS============================
     def finish_processing(self, parallel_strategy):
         """Finaliza el procesamiento y muestra resultados"""
         self.currently_processing = False
@@ -771,7 +751,6 @@ class PhotoFilterApp(TkinterDnD.Tk):
             f"Las imágenes procesadas están en:\n{self.output_folder}"
         ))
     
-    #================================FUNCION PARA ACTUALIZAR EL GRAFICO DE COMPARACION==================================
     def update_comparison_chart(self, parallel_strategy_name):
         """Actualiza el gráfico de comparación"""
         self.ax.clear()
@@ -818,7 +797,6 @@ class PhotoFilterApp(TkinterDnD.Tk):
         self.ax.grid(True, alpha=0.3, linestyle='--')
         self.canvas.draw()
 
-#====================MAIN=================================
 if __name__ == "__main__":
     app = PhotoFilterApp()
     app.mainloop()
